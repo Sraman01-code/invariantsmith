@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least privilege: this workflow executes untrusted Python, so the automatic
+# GITHUB_TOKEN must not be able to write to the repository.
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the older run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install project and dev tooling
+        run: python -m pip install -e ".[dev]"
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+
+  sandbox:
+    name: sandbox escape tests
+    runs-on: ubuntu-latest
+    # A runaway payload must not burn a full hour of runner time.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install project and dev tooling
+        run: python -m pip install -e ".[dev]"
+      # Docker is preinstalled on ubuntu-latest runners; no setup step needed.
+      - name: Build the sandbox image
+        run: docker build -t invariantsmith-sandbox:latest sandbox/
+      # -p no:cacheprovider keeps the runner's filesystem clean between steps.
+      - name: Run escape tests
+        run: python -m pytest -v -p no:cacheprovider

@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from sandbox.run import run_source
 from _helpers import assert_contained, requires_sandbox
+from sandbox.run import run_source
 
 TCP_PAYLOAD = """
 import socket

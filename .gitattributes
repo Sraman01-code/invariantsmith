@@ -1,0 +1,14 @@
+# Store text with LF in the repository and check it out with LF everywhere.
+#
+# Our containers and CI runners are Linux. A file committed with CRLF that ends
+# up as a shell script inside a container fails with "bad interpreter: /bin/sh^M",
+# which is a genuinely confusing hour to lose. Normalising here also silences
+# git's "LF will be replaced by CRLF" warnings on Windows checkouts.
+* text=auto eol=lf
+
+# Binary files must never be line-ending normalised.
+*.png binary
+*.jpg binary
+*.gz binary
+*.zip binary
+*.whl binary

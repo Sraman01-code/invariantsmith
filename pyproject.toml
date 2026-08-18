@@ -28,6 +28,11 @@ target-version = "py312"
 # E/W pycodestyle, F pyflakes, I import sorting, UP pyupgrade, B common bugs.
 select = ["E", "W", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.isort]
+# tests/_helpers.py is ours, but it is not an installed package, so ruff would
+# otherwise group it with third-party imports.
+known-first-party = ["_helpers"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [

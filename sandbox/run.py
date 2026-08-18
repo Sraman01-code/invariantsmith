@@ -37,6 +37,9 @@ class SandboxResult:
 
 
 def _security_flags(memory: str, pids: int, cpus: str) -> list[str]:
+    # Formatting is suppressed deliberately: one line per flag keeps each flag
+    # next to the attack it stops, which is the whole point of this function.
+    # fmt: off
     return [
         "--network", "none",                    # no interface at all: no exfiltration, no C2
         "--read-only",                          # immutable rootfs: nothing persists
@@ -51,6 +54,7 @@ def _security_flags(memory: str, pids: int, cpus: str) -> list[str]:
         "--ulimit", "fsize=1048576",            # 1 MiB max file write
         "--ulimit", "nofile=256:256",
     ]
+    # fmt: on
 
 
 def _kill(name: str) -> None:
@@ -88,6 +92,7 @@ def run_file(
     # host does NOT stop the container, it only detaches us from it.
     name = f"invsmith-{uuid.uuid4().hex[:12]}"
 
+    # fmt: off
     cmd = [
         "docker", "run", "--rm", "--name", name,
         *_security_flags(memory, pids, cpus),
@@ -97,6 +102,7 @@ def run_file(
         image,
         f"/work/{script.name}",
     ]
+    # fmt: on
 
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
