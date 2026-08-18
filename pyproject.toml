@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "invariantsmith"
+version = "0.1.0"
+description = "LLM proposes invariants; a symbolic solver and a fuzzer try to prove them wrong."
+requires-python = ">=3.12"
+# No runtime dependencies yet. We add them when a subsystem needs one, not in advance.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+# Flat layout with several top-level packages: setuptools will not guess, so we list them.
+[tool.setuptools]
+packages = ["ingest", "propose", "verify", "triage", "sandbox", "bench"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I import sorting, UP pyupgrade, B common bugs.
+select = ["E", "W", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "docker: requires a working Docker daemon (sandbox escape tests)",
+]
